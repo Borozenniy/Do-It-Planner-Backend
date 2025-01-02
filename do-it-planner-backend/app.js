@@ -15,13 +15,15 @@ app.get('/', (req, res) => {
 //* CORS
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Дозволяє запити з вашого фронтенду
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Дозволені HTTP-методи
-    credentials: true, // Дозволяє відправку cookie, якщо потрібно
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
   })
 );
 
 app.use(express.json()); // Для парсингу JSON тіла запиту
+
+//app.options('*', cors());
 
 //* MongoDB Connection
 
