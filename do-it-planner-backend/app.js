@@ -28,7 +28,6 @@ app.use(cors());
 // http://localhost:5173
 
 app.use(express.json()); // Для парсингу JSON тіла запиту
-
 //app.options('*', cors());
 
 //* MongoDB Connection
@@ -42,8 +41,12 @@ mongoose
     console.log(err);
   });
 
-app.use('/users', require('./src/routes/userRoutes'));
-app.use('/goals', require('.src/routes/goalRoutes'));
+app.use('/user', require('../do-it-planner-backend/src/routes/userRoutes'));
+app.use('/goal', require('../do-it-planner-backend/src/routes/goalRoutes'));
+app.use(
+  '/subgoal',
+  require('../do-it-planner-backend/src/routes/subgoalRoutes')
+);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
