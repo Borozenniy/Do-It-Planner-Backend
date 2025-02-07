@@ -1,25 +1,53 @@
 const express = require('express');
+const app = express();
+const http = require('http');
+const mongoose = require('mongoose');
+const port = 3000;
+const cors = require('cors');
+require('dotenv').config({ path: '.env' });
 
-const emojis = require('./emojis');
+const server = http.createServer(app);
 
-const router = express.Router();
-
-router.get('/', (req, res) => {
-  res.json({
-    message: 'API - 👋🌎🌍🌏',
-  });
+app.get('/', (req, res) => {
+  res.send('Hello World!');
 });
 
-router.use('/emojis', emojis);
+//* CORS
+app.options('*', cors());
 
-module.exports = router;
+//app.use(
+//  cors({
+//    origin: '*',
+//    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//    allowedHeaders: ['Content-Type', 'Authorization'],
+//    credentials: true,
+//  })
+//);
 
-//const app = require('./app');
+app.use(cors());
+// http://localhost:5173
 
-//const port = process.env.PORT || 5000;
-////const port = 5000;
-//app.listen(port, () => {
-//  /* eslint-disable no-console */
-//  console.log(`Listening: http://localhost:${port}`);
-//  /* eslint-enable no-console */
-//});
+app.use(express.json()); // Для парсингу JSON тіла запиту
+
+//app.options('*', cors());
+
+//* MongoDB Connection
+
+mongoose
+  .connect(process.env.MONGODB_URI, {})
+  .then(() => {
+    console.log('MongoDB Connected');
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+app.use('/user', require('./routes/userRoutes'));
+app.use('/goal', require('./routes/goalRoutes'));
+app.use('/subgoal', require('./routes/subgoalRoutes'));
+
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`);
+});
+
+module.exports = app;
