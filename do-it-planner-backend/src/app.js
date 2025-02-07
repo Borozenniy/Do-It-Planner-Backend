@@ -28,7 +28,7 @@ app.use(cors());
 // http://localhost:5173
 
 app.use(express.json()); // Для парсингу JSON тіла запиту
-
+ç;
 //app.options('*', cors());
 
 //* MongoDB Connection
