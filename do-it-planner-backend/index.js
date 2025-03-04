@@ -1,12 +1,19 @@
-const express = require('express');
-const app = express();
-const http = require('http');
-const mongoose = require('mongoose');
-const port = process.env.PORT || 3000;
-const cors = require('cors');
 require('dotenv').config({ path: '.env' });
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const http = require('http');
+const port = process.env.PORT || 3000;
+const { expressjwt } = require('express-jwt');
+const jwks = require('jwks-rsa');
 
-const server = http.createServer(app);
+//const AUTH_DOMAIN = 'http://localhost:3000';
+
+// Server initialization
+const app = express();
+
+app.use(express.json());
+app.use(cors());
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
@@ -25,11 +32,6 @@ app.options('*', cors());
 //);
 
 app.use(cors());
-// http://localhost:5173
-
-app.use(express.json()); // Для парсингу JSON тіла запиту
-//app.options('*', cors());
-
 //* MongoDB Connection
 
 mongoose
@@ -40,6 +42,32 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
+
+const checkJwt = expressjwt({
+  secret: jwks.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksUri: `https://${process.env.AUTH_DOMAIN}/.well-known/jwks.json`,
+  }),
+  audience: process.env.AUDIENCE,
+  issuer: `https://${process.env.AUTH_DOMAIN}/`,
+  algorithms: ['RS256'],
+});
+//const checkJwt = expressJwt({
+//  secret: jwks.expressJwtSecret({
+//    cache: true,
+//    rateLimit: true,
+//    //jwksRequestsPerMinute: 5,
+//    jwksUri: `http://${process.env.AUTH_DOMAIN}/.well-known/jwks.json`,
+//  }),
+//  audience: process.env.AUDIENCE,
+//  issuer: `http://${process.env.AUTH_DOMAIN}/`,
+//  algorithms: ['RS256'],
+//});
+
+app.get('/protected', checkJwt, (req, res) => {
+  res.json({ message: 'Це захищений маршрут!' });
+});
 
 app.use('/user', require('./routes/userRoutes'));
 app.use('/goal', require('./routes/goalRoutes'));
